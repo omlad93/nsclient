@@ -4,7 +4,7 @@ int main() //do you know what is int main() ?
 {
 	unsigned char hostname[100];
 
-	RetrieveDnsServersFromRegistry();
+	//RetrieveDnsServersFromRegistry();
 	
 	WSADATA firstsock;
 	printf("\nInitialising Winsock...");
