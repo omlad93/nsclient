@@ -52,9 +52,4 @@ typedef struct RES_RECORD {
     unsigned char *rdata;
 } RES_RECORD;
 
-// Structure of a Query
-typedef struct
-{
-    unsigned char *name;
-    struct QUESTION *ques;
-} QUERY;
+

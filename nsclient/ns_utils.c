@@ -1,8 +1,5 @@
 #include "ns_utils.h"
 
-// List of DNS Servers registered on the system
-char dns_servers[10][100];
-
 void SetDnsRequest(DNS_HEADER *dns) {
     dns->id = (unsigned short)(htons(GetCurrentProcessId()));
     dns->qr = 0;      // This is a query
@@ -26,50 +23,48 @@ void SendDnsQuery(SOCKET s, char *buf, char *name, SOCKADDR_IN dest, QUESTION *i
     info = (struct QUESTION *)&buf[sizeof(struct DNS_HEADER) + (strlen((const char *)name) + 1)];  // fill it
     info->type = htons(1);                                                                         // ipv4 address
     info->class = htons(1);                                                                        // its internet
-    //printf("\t\t\t -> Sending Packet\n");
+    // printf("\t\t\t -> Sending Packet\n");
     if (sendto(s, (char *)buf, sizeof(struct DNS_HEADER) + (strlen((const char *)name) + 1) + sizeof(struct QUESTION), 0, (struct sockaddr *)&dest, sizeof(dest)) == SOCKET_ERROR) {
         printf("\n\t\t\tERROR: Failed Sending Query (%d)", WSAGetLastError());
     }
 }
 
-void GetAnswer(SOCKET s, char *buf, SOCKADDR_IN dest, char* name, char* host_name) {
+void GetAnswer(SOCKET s, char *buf, SOCKADDR_IN dest, char *name, char *host_name) {
     int i = sizeof(dest);
     int stop;
-    char* reader;
+    char *reader;
     SOCKADDR_IN a;
     RES_RECORD answer;
-    //printf("\t\t\t <- Receiving Answer\n");
+    // printf("\t\t\t <- Receiving Answer\n");
     if (recvfrom(s, (char *)buf, 65536, 0, (struct sockaddr *)&dest, &i) == SOCKET_ERROR) {
         printf("\n\t\t\tERROR: Failed Getting Answer (%d)", WSAGetLastError());
     }
 
     // reading answers
-    reader = &buf[sizeof(struct DNS_HEADER) + (strlen((const char*)name) + 1) + sizeof(struct QUESTION)];
+    reader = &buf[sizeof(struct DNS_HEADER) + (strlen((const char *)name) + 1) + sizeof(struct QUESTION)];
     stop = 0;
     answer.name = ReadName(reader, buf, &stop);
     reader = reader + stop;
-    answer.resource = (struct R_DATA*)(reader);
+    answer.resource = (struct R_DATA *)(reader);
     reader = reader + sizeof(struct R_DATA);
 
     host_name[strlen(host_name) - 1] = '\0';
     if (ntohs(answer.resource->type) == 1) {
         // Has IPv4 Address
-        answer.rdata = (unsigned char*)malloc(ntohs(answer.resource->data_len));
+        answer.rdata = (unsigned char *)malloc(ntohs(answer.resource->data_len));
         for (int j = 0; j < ntohs(answer.resource->data_len); j++) {
             answer.rdata[j] = reader[j];
         }
         answer.rdata[ntohs(answer.resource->data_len)] = '\0';
         reader = reader + ntohs(answer.resource->data_len);
-        long* p = (long*)answer.rdata;
+        long *p = (long *)answer.rdata;
         a.sin_addr.s_addr = (*p);
         printf("\t\t > IPv4 = %s\n", inet_ntoa(a.sin_addr));
-    }
-    else {
+    } else {
         answer.rdata = ReadName(reader, buf, &stop);
         reader = reader + stop;
         printf("\t\t > Could not reach `%s`\n", host_name);
     }
-
 }
 
 void GetHost(unsigned char *host, char *ip) {
@@ -98,7 +93,7 @@ void GetHost(unsigned char *host, char *ip) {
     GetAnswer(s, buf, dest, name, host);
     dns = (struct DNS_HEADER *)buf;
     // move ahead of the dns header and the query field
-    
+
     return;
 }
 
@@ -147,7 +142,6 @@ unsigned char *ReadName(unsigned char *reader, unsigned char *buffer, int *count
     return name;
 }
 
-// this will convert www.google.com to 3www6google3com ;got it :)
 void DnsFormat(unsigned char *dns, unsigned char *host) {
     int lock = 0, i;
 
