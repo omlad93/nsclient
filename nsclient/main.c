@@ -6,13 +6,14 @@ int verify_domain_addr(char* addr) {
     int i;
     char c;
     int len = strlen(addr);
+    
     // Check the domain address length
     if (len < 2) {
-        printf("Domain address is too short\n");
+        printf("\t\t > ERROR - `%s`: Domain address is too short\n",addr);
         return 1;
     }
     if (len > 63) {
-        printf("Domain address is too long\n");
+        printf("\t\t > ERROR - `%s`: Domain address is too long\n",addr);
         return 1;
     }
 
@@ -22,7 +23,7 @@ int verify_domain_addr(char* addr) {
         if (((c > 'a') && (c < 'z')) || ((c > '0') && (c < '9')) || (c == '-') || (c == '.')) {
             if (((i - 3) >= 0) && ((i + 1) < len)) {
                 if ((c == '-') && (addr[i - 3] == '.') && (addr[i + 1] == '-')) {
-                    printf("The domain address does't meet domain address rouls\n");
+                    printf("\t\t > ERROR - `%s`: The domain address does't meet domain address rouls\n",addr);
                     return 1;
                 }
             }
@@ -32,9 +33,9 @@ int verify_domain_addr(char* addr) {
 }
 
 int ScanHostName(char* host) {
-    printf("\nPlease Enter Host Name:\n\t > ");
+    printf("\n\t > Please Enter Host Name:\n\t\t > ");
     if (scanf("%s", host) == 0) {
-        printf("\n\tERROR: Failed Scanning Host Name\n");
+        printf("\n\t\tERROR: Failed Scanning Host Name");
         return 1;
     }
     return 0;
@@ -42,29 +43,21 @@ int ScanHostName(char* host) {
 
 int main(int argc, char* argv[])  // do you know what is int main() ?
 {
-    unsigned char hostname[100];
     char domain[MAX_LENGTH];
-    int status;
     char* ip = argv[1];
     WSADATA firstsock;
 
-    // RetrieveDnsServersFromRegistry();
-
-    printf("\nRunning nsclient for: %s", ip);
+    printf("Running nsclient for: %s\n", ip);
     if (WSAStartup(MAKEWORD(2, 2), &firstsock) != 0) {
         printf("\n\tERROR: Failed Initialising Winsock (%d)", WSAGetLastError());
         return 1;
     }
 
-    while (ScanHostName(domain)) {
-        // Runs Until Host Name Accepted
-    }
-
+    ScanHostName(domain);
     while (strcmp(domain, "quit") != 0) {
         // syntactic verification of the domain address
-        status = verify_domain_addr(domain);
-        if (status) {
-            printf("\n\t\tERROR: Received Bad Name");
+        if (verify_domain_addr(domain)) {
+            // Error Printed in verify_domain_addr()
         } else {
             GetHost(domain, ip);
         }
