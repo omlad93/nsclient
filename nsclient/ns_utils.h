@@ -6,6 +6,12 @@
 //#include "winsock2.h"
 //#pragma comment(lib, "Ws2_32.lib")
 
+// Check format of host for lookup
+int verify_domain_addr(char *addr);
+
+// Scanning required host to look for
+int ScanHostName(char *host);
+
 // function for setting the Header
 void SetDnsRequest(DNS_HEADER *dns);
 
