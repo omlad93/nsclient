@@ -2,8 +2,7 @@
 
 #define MAX_LENGTH 2500
 
-int main(int argc, char* argv[])  // do you know what is int main() ?
-{
+int main(int argc, char* argv[]) {
     char domain[MAX_LENGTH];
     char* ip = argv[1];
     WSADATA firstsock;

@@ -7,17 +7,88 @@ in dotted-decimal notation (`8.8.8.8` for example).
 Given a DNS server, the program asks the user to enter the requested host (domain) and if it seems that is is possible host name, it sends the server a query the requested domain.  
 the programs keeps asking for more domain, until the user type `quit`.  
 **`Iris Taubkin`** 208410969  
-**`Omri Elad`** 204620702  
+**`Omri Elad`**    204620702  
 
 
 ## Implementation
 The program is divided into 3 modules:
 | idx | name     | files                  | comments                                    |
 | --- | -------- | ---------------------- | ------------------------------------------- |
-| 1   | main     | main.c                 | Main function: loop over domains            |
+| 1   | structs  | structs.h              | all the data structures needed for nsclient |
 | 2   | ns_utils | ns_utils.c, ns_utils.h | all the functions needed in main            |
-| 3   | structs  | structs.h              | all the data structures needed for nsclient |
+| 3   | main     | main.c                 | Main function: loop over domains            |
 
+### **STRUCTS Module**
+This Module is holding the necessary C-structures for querying a DNS server, matching for the message format represented in the assignment's appendix:
+
+```
+  Format                                                        
++---------------------+  
+| Header              |  
++---------------------+  
+| Question            |  the question for the name server  
++---------------------+  
+| Answer              |  RRs answering the question  
++---------------------+  
+| Authority           |  RRs pointing toward an authority  
++---------------------+  
+| Additional          |  RRs holding additional information  
++---------------------+  
+```
+We have the following structs, with the fields for the the information that changes from one message to another:
+```C
+typedef struct DNS_HEADER {} DNS_HEADER;
+typedef struct QUESTION   {} QUESTION;
+typedef struct R_DATA     {} R_DATA;
+typedef struct RES_RECORD {} RES_RECORD;
+```
+along with some macro definitions.  
+
+
+### **NS_UTILS Module**
+This is module containing all the functionality of querying a DNS server for domains.
+it provides a function for a single query:
+```C
+void GetHost(unsigned char *host, char *ip);
+```
+this function, which uses the rest of the functions written in this module:
+```C
+// Check format of host for lookup
+int verify_domain_addr(char *addr);
+
+// Scanning required host to look for
+int ScanHostName(char *host);
+
+// function for setting the Header
+void SetDnsRequest(DNS_HEADER *dns);
+
+// function for sending query request to the server
+void SendDnsQuery(SOCKET s, char *buf, char *name, SOCKADDR_IN dest, QUESTION *info);
+
+// function for getting & parsing the answer from server
+void GetAnswer(SOCKET s, char *buf, SOCKADDR_IN dest, char *name, char *host_name);
+
+// Helper function for parsing answers
+unsigned char *ReadName(unsigned char *reader, unsigned char *buffer, int *count);
+
+// Converting DNS format: from google.com to 6google3com )
+void DnsFormat(unsigned char *dns, unsigned char *host);
+```
+
+
+### **Main Module**  
+The Main module is providing the required interface of the assignment:
+it has a single function, which is compiled into the `.exe` file:
+```C
+ int main(int argc, char* argv[]);
+``` 
+this function expects a single argument: the address of a SND Server in a dotted-decimal format: such as `8.8.8.8` (Google\`s DNS server)  
+this function is an implementation of loop that asks the user for a domain to look for in each iteration, until it receives '`quit`'.  
+in each iteration the function runs a soft verification for the syntax of the domain, and if it seems as a legitimate domain a query request is sent using:
+```C
+GetHost(domain, ip);
+```
+<br>  
 
 ## Initialization Process on Visual Studio
 All this should be already configured in our solution. In case of an error follow this section:  
@@ -25,6 +96,7 @@ In order to be able to build `nsclient` properly, make sure to follow this steps
  * add `Ws2_32.lib` to `Linker->Input->Additional Dependencies`
  * add `_CRT_SECURE_NO_WARNINGS;_WINSOCK_DEPRECATED_NO_WARNINGS;` to `C/C++->Preprocessor->Preprocessor Definitions` to avoid VS C limitations.
  * ignore unsafe functions: add `4996` to `Properties > C/C++ > Advanced property->Disable Specific Warnings`
+
 
 ## Running Output Example
 ```Console
