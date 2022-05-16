@@ -21,8 +21,12 @@ The program is divided into 3 modules:
 ### **STRUCTS Module**
 This Module is holding the necessary C-structures for querying a DNS server, matching for the message format represented in the assignment's appendix:
 
+<<<<<<< HEAD
 ```
   Format                                                        
+=======
+```                                                        
+>>>>>>> 55ffec7 (submission #1)
 +---------------------+  
 | Header              |  
 +---------------------+  
