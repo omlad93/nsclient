@@ -38,10 +38,10 @@ This Module is holding the necessary C-structures for querying a DNS server, mat
 ```
 We have the following structs, with the fields for the the information that changes from one message to another:
 ```C
-typedef struct DNS_HEADER {} DNS_HEADER;
-typedef struct QUESTION   {} QUESTION;
-typedef struct R_DATA     {} R_DATA;
-typedef struct RES_RECORD {} RES_RECORD;
+typedef struct DNS_HEADER   DNS_HEADER;
+typedef struct QUESTION     QUESTION;
+typedef struct R_DATA       R_DATA;
+typedef struct RES_RECORD   RES_RECORD;
 ```
 along with some macro definitions.  
 
