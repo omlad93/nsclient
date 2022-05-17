@@ -6,8 +6,8 @@ The program gets a single command line argument which is the IP address of a DNS
 in dotted-decimal notation (`8.8.8.8` for example).  
 Given a DNS server, the program asks the user to enter the requested host (domain) and if it seems that is is possible host name, it sends the server a query the requested domain.  
 the programs keeps asking for more domain, until the user type `quit`.  
-The verification of the Domain is based on the rouls from:
-https://www.dnsbelgium.be/en/register-domain-name/valid
+The verification of the Domain is based on the rouls from:  
+https://www.dnsbelgium.be/en/register-domain-name/valid   
 **`Iris Taubkin`** 208410969  
 **`Omri Elad`**    204620702  
 
