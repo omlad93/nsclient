@@ -6,10 +6,12 @@ int verify_domain_addr(char *addr) {
     int len = strlen(addr);
 
     // Check the domain address length
+    //domain name consists of minimum two characters
     if (len < 2) {
         printf("\t\t > ERROR - `%s`: Domain address is too short\n", addr);
         return 1;
     }
+    //domain name consists of maximum 63 characters
     if (len > 63) {
         printf("\t\t > ERROR - `%s`: Domain address is too long\n", addr);
         return 1;
@@ -18,7 +20,14 @@ int verify_domain_addr(char *addr) {
     // Check all characters
     for (i = 0; i < len; i++) {
         c = addr[i];
+        //a domain name mustn't consist spaces
+        if (c == ' ') {
+            printf("\t\t > ERROR - `%s`: The domain address  mustn't consist spaces\n", addr);
+            return 1;
+        }
+        // The only characters that are allowed are: a-z, 0-9, '.', '-'
         if (((c > 'a') && (c < 'z')) || ((c > '0') && (c < '9')) || (c == '-') || (c == '.')) {
+            //a domain name mustn't consist of a '-' on the third and fourth position at the same time
             if (((i - 3) >= 0) && ((i + 1) < len)) {
                 if ((c == '-') && (addr[i - 3] == '.') && (addr[i + 1] == '-')) {
                     printf("\t\t > ERROR - `%s`: The domain address does't meet domain address rouls\n", addr);
