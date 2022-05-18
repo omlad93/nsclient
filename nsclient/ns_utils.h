@@ -6,6 +6,8 @@
 //#include "winsock2.h"
 //#pragma comment(lib, "Ws2_32.lib")
 
+#define TIMEOUT 3000
+
 // Check format of host for lookup
 int verify_domain_addr(char *addr);
 
@@ -16,13 +18,13 @@ int ScanHostName(char *host);
 void SetDnsRequest(DNS_HEADER *dns);
 
 // function for sending query request to the server
-void SendDnsQuery(SOCKET s, char *buf, char *name, SOCKADDR_IN dest, QUESTION *info);
+int SendDnsQuery(SOCKET s, char *buf, char *name, SOCKADDR_IN dest, QUESTION *info, int timeout);
 
 // function for getting & parsing the answer from server
-void GetAnswer(SOCKET s, char *buf, SOCKADDR_IN dest, char *name, char *host_name);
+int GetAnswer(SOCKET s, char *buf, SOCKADDR_IN dest, char *name, char *host_name, int timeout);
 
 // Function for querying ip for host
-void GetHost(unsigned char *host, char *ip);
+void GetHost(unsigned char *host, char *ip, int timeout);
 
 // Helper function for parsing answers
 unsigned char *ReadName(unsigned char *reader, unsigned char *buffer, int *count);

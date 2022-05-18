@@ -66,27 +66,34 @@ void SetDnsRequest(DNS_HEADER *dns) {
     dns->add_count = 0;
 }
 
-void SendDnsQuery(SOCKET s, char *buf, char *name, SOCKADDR_IN dest, QUESTION *info) {
+int SendDnsQuery(SOCKET s, char *buf, char *name, SOCKADDR_IN dest, QUESTION *info,int timeout) {
     int i = sizeof(dest);
     info = (struct QUESTION *)&buf[sizeof(struct DNS_HEADER) + (strlen((const char *)name) + 1)];  // fill it
     info->type = htons(1);                                                                         // ipv4 address
     info->class = htons(1);                                                                        // its internet
     // printf("\t\t\t -> Sending Packet\n");
+    if (setsockopt(s, SOL_SOCKET, SO_SNDTIMEO, (char*)&timeout, (unsigned int)sizeof(timeout)) == SOCKET_ERROR) {
+        printf("\t\t > Could not set timeout\n");
+        return 1;
+    }
     if (sendto(s, (char *)buf, sizeof(struct DNS_HEADER) + (strlen((const char *)name) + 1) + sizeof(struct QUESTION), 0, (struct sockaddr *)&dest, sizeof(dest)) == SOCKET_ERROR) {
         printf("\n\t\t\tERROR: Failed Sending Query (%d)", WSAGetLastError());
+        return 1;
     }
+    return 0;
 }
 
-void GetAnswer(SOCKET s, char *buf, SOCKADDR_IN dest, char *name, char *host_name) {
+int GetAnswer(SOCKET s, char *buf, SOCKADDR_IN dest, char *name, char *host_name,int timeout) {
     int i = sizeof(dest);
     int stop;
     char *reader;
     SOCKADDR_IN a;
     RES_RECORD answer;
-    // printf("\t\t\t <- Receiving Answer\n");
     if (recvfrom(s, (char *)buf, 65536, 0, (struct sockaddr *)&dest, &i) == SOCKET_ERROR) {
         printf("\n\t\t\tERROR: Failed Getting Answer (%d)", WSAGetLastError());
+        return 1;
     }
+    return 0;
 
     // reading answers
     reader = &buf[sizeof(struct DNS_HEADER) + (strlen((const char *)name) + 1) + sizeof(struct QUESTION)];
@@ -115,7 +122,7 @@ void GetAnswer(SOCKET s, char *buf, SOCKADDR_IN dest, char *name, char *host_nam
     }
 }
 
-void GetHost(unsigned char *host, char *ip) {
+void GetHost(unsigned char *host, char *ip, int timeout) {
     unsigned char buf[65536], *name;
     SOCKET s;
     SOCKADDR_IN dest;
@@ -137,8 +144,14 @@ void GetHost(unsigned char *host, char *ip) {
     // point to the query portion
     name = (unsigned char *)&buf[sizeof(struct DNS_HEADER)];
     DnsFormat(name, host);
-    SendDnsQuery(s, buf, name, dest, info);
-    GetAnswer(s, buf, dest, name, host);
+
+    if (SendDnsQuery(s, buf, name, dest, info, timeout)) {
+        return;
+    }
+    //set receive timeout to 2000ms = 2 secs as required
+    if (GetAnswer(s, buf, dest, name, host, timeout)) {
+        return;
+    }
     dns = (struct DNS_HEADER *)buf;
     // move ahead of the dns header and the query field
 

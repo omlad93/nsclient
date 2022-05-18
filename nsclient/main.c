@@ -6,7 +6,6 @@ int main(int argc, char* argv[]) {
     char domain[MAX_LENGTH];
     char* ip = argv[1];
     WSADATA firstsock;
-
     printf("Running nsclient for: %s\n", ip);
     if (WSAStartup(MAKEWORD(2, 2), &firstsock) != 0) {
         printf("\n\tERROR: Failed Initialising Winsock (%d)", WSAGetLastError());
@@ -19,7 +18,7 @@ int main(int argc, char* argv[]) {
         if (verify_domain_addr(domain)) {
             // Error Printed in verify_domain_addr()
         } else {
-            GetHost(domain, ip);
+            GetHost(domain, ip, TIMEOUT);
         }
         ScanHostName(domain);
     }
