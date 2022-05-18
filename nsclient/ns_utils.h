@@ -7,6 +7,7 @@
 //#pragma comment(lib, "Ws2_32.lib")
 
 #define TIMEOUT 3000
+#define MAX_DOMAIN_SZ 100
 
 // Check format of host for lookup
 int verify_domain_addr(char *addr);

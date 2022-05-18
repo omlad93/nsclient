@@ -1,6 +1,6 @@
 #include "ns_utils.h"
 
-int verify_domain_addr(char *addr) {
+int verify_domain_addr(char* addr) {
     int i;
     char c;
     int len = strlen(addr);
@@ -39,12 +39,24 @@ int verify_domain_addr(char *addr) {
     return 0;
 }
 
-int ScanHostName(char *host) {
+int ScanHostName(char* host) {
+    char* not_strriped;
+    int i = 0;
     printf("\n\t > Please Enter Host Name:\n\t\t > ");
-    if (scanf("%s", host) == 0) {
+    not_strriped = fgets(host, MAX_DOMAIN_SZ, stdin);
+    if (not_strriped == NULL) {
         printf("\n\t\tERROR: Failed Scanning Host Name");
         return 1;
     }
+    while (not_strriped[i] != '\n'){
+        host[i] = not_strriped[i];
+        i++;
+    }
+    host[i] = '\0';
+    //if (scanf("%s", host) == 0) {
+        //printf("\n\t\tERROR: Failed Scanning Host Name");
+        //return 1;
+    //}
     return 0;
 }
 
@@ -93,7 +105,6 @@ int GetAnswer(SOCKET s, char *buf, SOCKADDR_IN dest, char *name, char *host_name
         printf("\n\t\t\tERROR: Failed Getting Answer (%d)", WSAGetLastError());
         return 1;
     }
-    return 0;
 
     // reading answers
     reader = &buf[sizeof(struct DNS_HEADER) + (strlen((const char *)name) + 1) + sizeof(struct QUESTION)];
@@ -120,6 +131,7 @@ int GetAnswer(SOCKET s, char *buf, SOCKADDR_IN dest, char *name, char *host_name
         reader = reader + stop;
         printf("\t\t > Could not reach `%s`\n", host_name);
     }
+    return 0;
 }
 
 void GetHost(unsigned char *host, char *ip, int timeout) {
@@ -144,7 +156,6 @@ void GetHost(unsigned char *host, char *ip, int timeout) {
     // point to the query portion
     name = (unsigned char *)&buf[sizeof(struct DNS_HEADER)];
     DnsFormat(name, host);
-
     if (SendDnsQuery(s, buf, name, dest, info, timeout)) {
         return;
     }
