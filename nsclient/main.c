@@ -16,8 +16,6 @@ int main(int argc, char* argv[]) {
     while (strcmp(domain, "quit") != 0) {
         // syntactic verification of the domain address
         if (verify_domain_addr(domain)) {
-            // Error Printed in verify_domain_addr()
-        } else {
             GetHost(domain, ip, TIMEOUT);
         }
         ScanHostName(domain);

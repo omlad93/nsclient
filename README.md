@@ -52,7 +52,7 @@ it provides a function for a single query:
 ```C
 #define TIMEOUT 3000
 
-// Check format of host for lookup
+// Check format of host for lookup: retrun 1 for good, 0 for bad
 int verify_domain_addr(char *addr);
 
 // Scanning required host to look for

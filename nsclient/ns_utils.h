@@ -3,13 +3,12 @@
 #include "stdio.h"
 #include "structs.h"
 #include "windows.h"
-//#include "winsock2.h"
-//#pragma comment(lib, "Ws2_32.lib")
+
 
 #define TIMEOUT 3000
 #define MAX_DOMAIN_SZ 100
 
-// Check format of host for lookup
+// Check format of host for lookup: retrun 1 for good, 0 for bad
 int verify_domain_addr(char *addr);
 
 // Scanning required host to look for
